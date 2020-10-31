@@ -1,0 +1,33 @@
+server:
+  affinity: "" #important: set affinity empty if you're using a single-node cluster, like Minikube
+  ha:
+    enabled: true
+    replicas: 2
+    raft:
+      enabled: true
+      config: |
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        seal "azurekeyvault" {
+          tenant_id       = "Key Vaults' Directory ID"
+          client_id       = "Service Principal's Application ID"
+          client_secret   = "Service Principal's generated secret"
+          vault_name      = "Name of Azure Key Vault instance"
+          key_name        = "Name of generated key"
+          subscription_id = "ID of the subscription"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+        }
+
+        service_registration "kubernetes" {}
+  dataStorage:
+    enabled: true
+    size: 500Mi
